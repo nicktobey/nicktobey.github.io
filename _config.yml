@@ -1,0 +1,26 @@
+# Dependencies
+markdown:            redcarpet
+highlighter:         pygments
+
+# Permalinks
+#
+# Use of `relative_permalinks` ensures post links from the index work properly.
+permalink:           pretty
+relative_permalinks: true
+
+# Setup
+title:               Nick Tobey
+tagline:             'Words Arranged in a Meaningful Pattern'
+description:         'The personal website of Nick Tobey'
+url:                 http://nicktobey.me
+baseurl:             /
+paginate:            5
+
+# About/contact
+author:
+  name:              Nick Tobey
+  url:               http://nicktobey.me
+  email:             ndtobey3@gmail.com
+
+# Custom vars
+version:             1.0.0
