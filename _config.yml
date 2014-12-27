@@ -12,15 +12,15 @@ relative_permalinks: true
 title:               Nick Tobey
 tagline:             'Words Arranged in a Meaningful Pattern'
 description:         'The personal website of Nick Tobey'
-url:                 http://nicktobey.me
-baseurl:             http://nicktobey.me
+url:                 http://nicktobey.me/
+baseurl:             http://nicktobey.me/
 repo:                nicktobey/nicktobey.github.io
 paginate:            5
 
 # About/contact
 author:
   name:              Nick Tobey
-  url:               http://nicktobey.me
+  url:               http://nicktobey.me/
   email:             ndtobey3@gmail.com
 
 # Custom vars
