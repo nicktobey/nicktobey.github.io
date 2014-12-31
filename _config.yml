@@ -9,9 +9,9 @@ permalink:           pretty
 relative_permalinks: true
 
 # Setup
-title:               Nick Tobey
-tagline:             'Words Arranged in a Meaningful Pattern'
-description:         'The personal website of Nick Tobey'
+title:               Toward Ten Thousand Hours
+tagline:             'The programning blog of Nick Tobey'
+description:         ''
 url:                 http://nicktobey.me/
 baseurl:             http://nicktobey.me/
 repo:                nicktobey/nicktobey.github.io
@@ -21,7 +21,7 @@ paginate:            5
 author:
   name:              Nick Tobey
   url:               http://nicktobey.me/
-  email:             ndtobey3@gmail.com
+  email:             nicktobey@nicktobey.me
 
 # Custom vars
 version:             1.0.0
