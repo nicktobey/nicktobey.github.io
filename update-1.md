@@ -5,6 +5,8 @@ short_title: Update 1
 show: true
 ---
 
+*(The github project containing all the code from this post [can be found here](https://github.com/nicktobey/multigame))*
+
 In my last post, I outlined a project I called Delectibles (A contraction of 'Digital Collectibles') that would allow users to play turn-based games with digital collections by allowing the users to verify each other's collections and use Mental Poker to prevent cheating (the discovery or manipulation of random or hidden information). But this was clearly several independant codebases. Permitting a user to bring a game piece into the game by verifying that they actually own said piece is a completely separate problem than preventing cheating by manipulating pieces that are already in the game. And Mental Poker can authenticate actions taken by users, but it says nothing at all about whether those actions are consistent within the rules of the game that is being played. So what was proposed as one monolithic library is actually three: one to prove ownership of game pieces, one to prevent cheating, and a third to actually lay out the rules of the game.
 
 This third piece, which I call Multigame, is this focus of this update.
