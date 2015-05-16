@@ -41,24 +41,25 @@ This notation allows us to completely describe any game in a table, merely by li
 
 What is practical is calculating the part of the table that is immediately relevant for a given game state. Let's say that we have a tic-tac-toe board in the following position:
 
-| X |   | X |
-|---|---|---|
-|   | X | O |
-|   |   | O |
-
-    board = {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2]]} (This is just one possible way we could represent the board as a data object.)
+```
+ X |   | X 
+   | X | O 
+   |   | O 
+board = {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2]]} (This is just one possible way we could represent the board as a data object.)
     
-    activePlayer = 'O'
+activePlayer = 'O'
+```
 
 We could create a table mapping each legal move to a transformation function and the resulting game state:
 
-    Choice   Transformation Function            New active player    New Game State
+```
+Choice   Transformation Function            New active player    New Game State
     
-    [0,1]        (board) -> board.O.push [0,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [0,1]]}
-    [1,0]        (board) -> board.O.push [1,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [1,0]]}
-    [2,0]        (board) -> board.O.push [2,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,0]]}
-    [2,1]        (board) -> board.O.push [2,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,1]]}
-
+[0,1]        (board) -> board.O.push [0,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [0,1]]}
+[1,0]        (board) -> board.O.push [1,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [1,0]]}
+[2,0]        (board) -> board.O.push [2,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,0]]}
+[2,1]        (board) -> board.O.push [2,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,1]]}
+```
 Viewing games as a group of generated tables like this suggests an API: Instead of listing every possible game state, a game descriptor file needs to be able to do one of the following:
 
 Option 1: (Functional Programming Approach)
