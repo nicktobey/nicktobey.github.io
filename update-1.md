@@ -35,88 +35,90 @@ While a game is being played, it moves through a sequence of different game stat
 
 We can formally represent a game as a tuple (S, ?), where S is the set of all possible game states, and ? is the set of all options. In this way, a game becomes a state machine. (A formal state machine requires that each state transition be a pair of an input and output state. We can achieve this by saying that if any option is nondeterministic, then each possible resulting state has its own edge in the state machine.)
 
-This notation allows us to completely describe any game in a table, merely by listing the possible game states and listing all transitions. This doesn't mean that such a table will necessarily be short (or even have finite length!) [For example, the game of Tic-Tac-Toe has 5,478 possible board states and 549,946 different possible options.](http://www.mathrec.org/old/2002jan/solutions.html) A more complicated game like chess could still be reperesented in this manner, but chess has 10^47 possible board states, and listing them all would be extremely impractical.
+This notation allows us to completely describe any game in a table, merely by listing the possible game states and listing all transitions. This doesn't mean that such a table will necessarily be short (or even have finite length!) For example, the game of Tic-Tac-Toe has 5,478 possible board states and 549,946 different possible options. (http://www.mathrec.org/old/2002jan/solutions.html) A more complicated game like chess could still be reperesented in this manner, but chess has 10^47 possible board states, and listing them all would be extremely impractical.
 
 What is practical is calculating the part of the table that is immediately relevant for a given game state. Let's say that we have a tic-tac-toe board in the following position:
 
+```
 X| |X
-\- - -
+- - -
  |X|O
-\- - -
+- - -
  | |O
 
 board = {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2]]} (This is just one possible way we could represent the board as a data object.)
 
 activePlayer = 'O'
-
+```
 
 We could create a table mapping each legal move to a transformation function and the resulting game state:
 
-
+```
 Choice   Transformation Function            New active player    New Game State
 
 [0,1]        (board) -> board.O.push [0,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [0,1]]}
 [1,0]        (board) -> board.O.push [1,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [1,0]]}
 [2,0]        (board) -> board.O.push [2,0]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,0]]}
 [2,1]        (board) -> board.O.push [2,1]    X                    {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2], [2,1]]}
+```
 
 Viewing games as a group of generated tables like this suggests an API: Instead of listing every possible game state, a game descriptor file needs to be able to do one of the following:
 
 Option 1: (Functional Programming Approach)
 
--For a given game state, enumerate the possible Options and assign each one a unique id.
+-  For a given game state, enumerate the possible Options and assign each one a unique id.
 
--For a given game state and an option id, check whether the given option is possible and return a new game state object that shows the result of choosing that option.
+-  For a given game state and an option id, check whether the given option is possible and return a new game state object that shows the result of choosing that option.
 
 Option 2: (Imperitive Programming Approach)
 
--For a given game state, enumerate the possible Options and assign each one a unique id.
+-  For a given game state, enumerate the possible Options and assign each one a unique id.
 
--For a given game state, check whether the given option is possible and apply the option to the game state, transforming it.
+-  For a given game state, check whether the given option is possible and apply the option to the game state, transforming it.
 
 
-Whats so deceptive here is that at a first glance, it doesnt even seem like theres a choice to be made.  In my initial draft, the rules script created the functions and data structures that governed how the game was played, and created and stored a singleton initial game state, which would be transformed by submitted options. Instead of exporting an object that contained the entire game state, parts of the game state were only referenceable through function closures in the Option objects. This was for all practical purposes a strictly worse version of the second option. I came to realize that this was a violation of separation of concerns, the maxim that any unit of code (be it function or library or file) should do one thing and do it well. But my rules script was trying to do two things when really, it should lay down the rules and nothing more. It should describe how to create the initial game state, but should not actually do it.
+What's so deceptive here is that at a first glance, it doesn't even seem like there's a choice to be made.  In my initial draft, the rules script created the functions and data structures that governed how the game was played, and created and stored a singleton initial game state, which would be transformed by submitted options. Instead of exporting an object that contained the entire game state, parts of the game state were only referenceable through function closures in the Option objects. This was for all practical purposes a strictly worse version of the second option. I came to realize that this was a violation of "separation of concerns", the maxim that any unit of code (be it function or library or file) should do one thing and do it well. But my rules script was trying to do two things when really, it should lay down the rules and nothing more. It should describe how to create the initial game state, but should not actually do it.
 
-This is perhaps the most important design decision in this update, even though it doesnt immediately seem like one. In my experience, the most important decisions are usually the ones that dont even look like decisions. Learning to recognize these hidden opportunities is an important skill for any software engineer.
+This is perhaps the most important design decision in this update, even though it doesn't immediately seem like one. In my experience, the most important decisions are usually the ones that don't even look like decisions. Learning to recognize these hidden opportunities is an important skill for any software engineer.
 
 So how do we proceed from here?
 
 Both of the options outlined above offer several advantages over my original naive implementation:
 
--Building test cases is much easier when the test case can supply an already built game state.
+-  Building test cases is much easier when the test case can supply an already built game state.
 
--The rules file only has to be loaded and processed once, and several games can be run simultaneously.
+-  The rules file only has to be loaded and processed once, and several games can be run simultaneously.
 
--The game state can be saved out to a file or data structure and loaded back in, allowing games to be paused and resumed, or a game to begin from a configuration other than its normal initial configuration.
+-  The game state can be saved out to a file or data structure and loaded back in, allowing games to be paused and resumed, or a game to begin from a configuration other than its normal initial configuration.
 
 
 There are programmers today that push strongly for a functional programming approach in everything. And it does have its benefits. For example, the first option has additional advantages over the seocond:
 
--Making the game state object immutable means that a reference to the game state can be kept as a snapshot of the game at a particular point in time, without having to worry about the object being modified or having to create a deep copy of it. This is useful for recording purposes.
+-  Making the game state object immutable means that a reference to the game state can be kept as a snapshot of the game at a particular point in time, without having to worry about the object being modified or having to create a deep copy of it. This is useful for recording purposes.
 
--A player can simulate future outcomes from a particular game state without having to worry about mutating the game state or manually creating copies of it. This is useful for AI or for a user interface that lets a player experiment with future possible outcomes.
+-  A player can simulate future outcomes from a particular game state without having to worry about mutating the game state or manually creating copies of it. This is useful for AI or for a user interface that lets a player experiment with future possible outcomes.
 
 
 But this method has drawbacks, related to the process of creating a new game state from the existing one:
 
-- Creating a new game state from an old one can require knowledge of how the game state is structured, and this isnt necessarily trivial.
+- Creating a new game state from an old one can require knowledge of how the game state is structured, and this isn't necessarily trivial.
 
-- If a new game state object is created every time an option would change it, this can lead to lots of unnecessary object creations and destructions, a performance penalty that scales with the complexity of the game state. It could be equally foolish to focus on optimizing something that hasnt been proven to be a problem yet, so this penalty is something to keep in mind, but is not outright a reason to dismiss this approach.
+- If a new game state object is created every time an option would change it, this can lead to lots of unnecessary object creations and destructions, a performance penalty that scales with the complexity of the game state. It could be equally foolish to focus on optimizing something that hasn't been proven to be a problem yet, so this penalty is something to keep in mind, but is not outright a reason to dismiss this approach.
 
 
 These two drawbacks are wholly dependant on how the game state object is represented internally. If we can devise a representation that can easily be instantiated from an old game state and an applied Option, without adding restrictions or complications to the process of creating a rules file, then the drawbacks are inconsequential, and it becomes better to take the functional programming approach.
 
-One option comes from recognizing that any game state is created by sequential **effects** to an initial game state, where an effect is the outcome of executing an option. Its possible for us to represent the game state as this list of effects. If the list is a linked list, we can append new effects to the front of the list, creating the new game state in constant time.
+One option comes from recognizing that any game state is created by sequential **effects** to an initial game state, where an effect is the outcome of executing an option. It's possible for us to represent the game state as this list of effects. If the list is a linked list, we can append new effects to the front of the list, creating the new game state in constant time.
 
 But now, every time we want to read a value from the game state, we must iterate through the list until we find the relevant bit of information. We could potentially overcome this by caching read values at the front of the list so that the next read won't take as long. But for right now, we won't worry about this. Until we have a finalized model for how game state will be internally represented, we don't need to worry about optimizing our approach. Knowing that the approach works will be enough for now.
 
-With all this research and planning behind us, lets start writing code. We need to nail down an API to be used by the rules file to convey the rules for a game to the game engine. The best way to create a sensible and predictable API is to create a use case first: lets create a prototype rules file and see how we would instinctively want to express the rules for a simple game like Tic Tac Toe. (The rules file is currently a coffeescript script that is loaded and executed in a special environment. The major downside is that this requires that the rules file be trusted, so this is by no means a final solution.)
+With all this research and planning behind us, let's start writing code. We need to nail down an API to be used by the rules file to convey the rules for a game to the game engine. The best way to create a sensible and predictable API is to create a use case first: let's create a prototype rules file and see how we would instinctively want to express the rules for a simple game like Tic Tac Toe. (The rules file is currently a coffeescript script that is loaded and executed in a special environment. The major downside is that this requires that the rules file be trusted, so this is by no means a final solution.)
 
-Whats the most important part of a game? The players. So lets tell the engine about the players.
+What's the most important part of a game? The players. So let's tell the engine about the players.
 
 ```
-X = new Player(X)
-O = new Player(O)
+X = new Player("X")
+O = new Player("O")
 ```
 
 The string parameters are ids that we can use to reference the players later, since the variables X and O will only exist in this local scope.
@@ -128,7 +130,7 @@ X.opponent = O
 O.opponent = X
 ```
 
-There is no builtin way to dictate turn order, since not all games settle for something as simple as clockwise around the table. We will handle turn order by having each player pass the baton to the player listed as their opponent. (Well get to that in a bit.)
+There is no builtin way to dictate turn order, since not all games settle for something as simple as "clockwise around the table." We will handle turn order by having each player pass the baton to the player listed as their opponent. (We'll get to that in a bit.)
 
 The main building block of the game is the Piece, an object that represents a manipulatable part of the game, such as a card or space on a board. Any options that a player can choose are granted by pieces in play. Actions that should always be available or variables that are always present are owned by Pieces that are created at the start of the game and cannot be removed. For our game of Tic Tac Toe, each space on the grid is its own Piece. Since the behavior of each grid space is effectively the same, we can subclass the Piece class. Below is the entire class definition:
 
@@ -155,7 +157,7 @@ class GridSpace extends UnownedPiece
                 player.opponent
 ```
 
-Lets go through this line by line:
+Let's go through this line by line:
 
 ```
 class GridSpace extends UnownedPiece
@@ -163,16 +165,16 @@ class GridSpace extends UnownedPiece
         super
 ```
 
-Oftentimes, a Piece has one player that owns it. In a card game, you own the cards in your hand, for example. But board spaces arent owned by any player, so we subclass a special class UnownedPiece (which itself subclasses Piece). We override the constructor so that it takes two values, a row and column of the space in the grid, which we will use to construct the spaces unique id. We then call the superclasss constructor because as far as I can tell, this isnt done automatically in Coffeescript.
+Oftentimes, a Piece has one player that owns it. In a card game, you own the cards in your hand, for example. But board spaces aren't owned by any player, so we subclass a special class UnownedPiece (which itself subclasses Piece). We override the constructor so that it takes two values, a row and column of the space in the grid, which we will use to construct the space's unique id. We then call the superclass's constructor because as far as I can tell, this isn't done automatically in Coffeescript.
 
 ```
         @id = [@i, @j]
         @controller = null
 ```
 
-We create the id instance variable. I chose to keep it as an array, but due to Javascripts weak typing it will be coerced into a string automatically when its used as a key. Just remember that every pieces id should be unique when coerced to a string.
+We create the id instance variable. I chose to keep it as an array, but due to Javascript's weak typing it will be coerced into a string automatically when it's used as a key. Just remember that every piece's id should be unique when coerced to a string.
 
-We also create the instance variable @controller to denote which player has claimed the space. At the start of the game, neither player has the space, so its equal to null. We could have tried to combine the notion of a controller with the notion of an owner as outlined above, but changing a Pieces owner changes some of its default behavior (for example, by default players can only choose options on Pieces they own and UnownedPieces), so its better to keep these two ideas separate.
+We also create the instance variable @controller to denote which player has claimed the space. At the start of the game, neither player has the space, so it's equal to null. We could have tried to combine the notion of a controller with the notion of an owner as outlined above, but changing a Piece's owner changes some of its default behavior (for example, by default players can only choose options on Pieces they own and UnownedPieces), so it's better to keep these two ideas separate.
 
 ```
         @addOption
@@ -197,13 +199,13 @@ The option to claim a space on the board is closely related to the state of the 
 
 We use the addOption instance method to create a new option connected to that piece. We pass a dictionary containing the following fields:
 
-- id: A unique id for this option. When a player queries the options they have available, they are not given the actual option objects, but an array of ids. Like the ids for pieces, each of these ids must be distinct when coerced to a string, so its best to use only primitives and arrays of primitives when constructing an id. Since each piece here has exactly one option, we use the same ids we used for the pieces.
-- condition: A condition that must hold for the option to be available to a player. In this case, the space must not be claimed by any player.
-- ownershipCondition: An additional condition that must hold for the option to be available to the player. If ommitted (like we did here), it returns true for UnownedPieces and checks whether the owner is the same as the player calling it otherwise. This is used in complex games where your own pieces give your opponents additional options.
-- effect: A function that will be called when the option is chosen that changes the game state. In our case, we change the controller of the grid space to the player choosing the option, then check to see whether that player has won or whether the game has drawn. If the game is over, we set the corresponding fields in the gameState variable so that our gui will be able to detect it.
-- nextActivePlayer: The player who will make the next choice. In this case, once a player claims a space their turn is over, and their opponent makes the next choice. 
+- *id*: A unique id for this option. When a player queries the options they have available, they are not given the actual option objects, but an array of ids. Like the ids for pieces, each of these ids must be distinct when coerced to a string, so it's best to use only primitives and arrays of primitives when constructing an id. Since each piece here has exactly one option, we use the same ids we used for the pieces.
+- *condition*: A condition that must hold for the option to be available to a player. In this case, the space must not be claimed by any player.
+- *ownershipCondition*: An additional condition that must hold for the option to be available to the player. If ommitted (like we did here), it returns true for UnownedPieces and checks whether the owner is the same as the player calling it otherwise. This is used in complex games where your own pieces give your opponents additional options.
+- *effect*: A function that will be called when the option is chosen that changes the game state. In our case, we change the controller of the grid space to the player choosing the option, then check to see whether that player has won or whether the game has drawn. If the game is over, we set the corresponding fields in the gameState variable so that our gui will be able to detect it.
+- *nextActivePlayer*: The player who will make the next choice. In this case, once a player claims a space their turn is over, and their opponent makes the next choice. 
 
-Next lets go on ahead and define those win and draw functions we just used:
+Next let's go on ahead and define those win and draw functions we just used:
 
 ```
 win = (pieces, i, j) ->
@@ -275,7 +277,7 @@ rules.newGame() - this method creates and returns a new initial gamestate.
 
 gameState.commitOption(player, pieceID, optionID) - this method attempts to apply an option equivalent to the given player choosing the option with the given ID on the piece with the given ID.
 
-Now we need to implement the interface we used in these files.  Lets start with some of the classes:
+Now we need to implement the interface we used in these files.  Let's start with some of the classes:
 
 ```
 class Player
@@ -302,9 +304,9 @@ class OwnedPiece extends Piece
         return options
 ```
 
-Even though we dont have any owned pieces in the Tic-Tac-Toe rules, its clear how an owned piece should behave. It has an owner variable which is set during construction, and it has a getOptions method that returns every option on the piece that is a legal choice given the current game state. We do this by filtering the set of options via the option.condition and option.ownershipCondition methods (or of option.ownershipCondition is not set, checking that the current player matches the pieces owner.)
+Even though we don't have any owned pieces in the Tic-Tac-Toe rules, it's clear how an owned piece should behave. It has an owner variable which is set during construction, and it has a getOptions method that returns every option on the piece that is a legal choice given the current game state. We do this by filtering the set of options via the option.condition and option.ownershipCondition methods (or of option.ownershipCondition is not set, checking that the current player matches the piece's owner.)
 
-UnownedPiece is very similar, except it doesnt have an ownership condition or an owner:
+UnownedPiece is very similar, except it doesn't have an ownership condition or an owner:
 
 ```
 class UnownedPiece extends Piece
@@ -352,9 +354,9 @@ The most important part is the commitOption method, which generates a new game s
 
 The first two if statements just check that the committed option is actually a legal option to take. (This is more to prevent accidents than it is to stop any real malicious behavior, since this code may be running on the same machine used by a player, in which case a player could easily modify the generated javascript. Stopping players from cheating is an entirely different beast and requires us to consider how the game will actually be accessed by players. We save worrying about that for a higher layer.)
 
-The magic is in the Object.create method, which makes use of javascripts prototype-based inheritance to effectively make a shallow copy without incurring the cost of copying each value. The new object references the old one as its prototype, so when the javascript interpreter tries to dereference a field that doesnt exist on the new object, it moves up the prototype chain and checks the old one.
+The magic is in the Object.create method, which makes use of javascript's prototype-based inheritance to effectively make a shallow copy without incurring the cost of copying each value. The new object references the old one as it's prototype, so when the javascript interpreter tries to dereference a field that doesn't exist on the new object, it moves up the prototype chain and checks the old one.
 
-This isnt optimized. A property that exists many levels up the prototype tree will take longer to access every time. Worse, if we try to modify another piece, or a property of a piece or option has its own fields, we could very easily end up modifying a reference shared by several different game state objects, which breaks our guarantee that game states not be modified after they are created. Its much better to use a dedicated immutable data structures library, but as the maxim goes, premature optimization is the root of all evil.  For now, we settle for having a rule that in an options effect, if you would modify any piece other than the piece belonging to the option, or if you would modify a property on the piece with more than one level of indirection, you clone the appropriate objects to guarantee that you dont modify shared values.
+This isn't optimized. A property that exists many levels up the prototype tree will take longer to access every time. Worse, if we try to modify another piece, or a property of a piece or option has its own fields, we could very easily end up modifying a reference shared by several different game state objects, which breaks our guarantee that game states not be modified after they are created. It's much better to use a dedicated immutable data structures library, but as the maxim goes, premature optimization is the root of all evil.  For now, we settle for having a rule that in an option's effect, if you would modify any piece other than the piece belonging to the option, or if you would modify a property on the piece with more than one level of indirection, you clone the appropriate objects to guarantee that you don't modify shared values.
 
 Lastly, we need to create the Multigame.load method, which reads in a provided rules script and executes it.
 ```
@@ -389,4 +391,4 @@ Likewise, making a game with nondetermistic elements is going to require some co
 
 Sooner or later, if we want to make a networked game, we're going to have to tackle these problems. But that's getting ahead of ourselves. Before we can tackle these bigger problems, we should work on perfecting this model. That's why in the next update, I'll discuss improvements to the model, both in terms of API design and efficeincy. I will discuss possible use cases and create unit tests that verify that the guarentees I claim this model provides (such as protection from inadvertantly mutating game states) are actually provided.
 
-Next up: Immutable data types, decision trees, and unit testing!
+**Next up: Immutable data types, decision trees, and unit testing!**
