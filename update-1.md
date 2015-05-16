@@ -9,9 +9,9 @@ In my last post, I outlined a project I called Delectibles (A contraction of 'Di
 
 This third piece, which I call Multigame, is this focus of this update.
 
-Layer 1: Delectibles
-Layer 2: Mental Poker
-Layer 3: Multigame
+Layer 1: Delectibles  
+Layer 2: Mental Poker  
+Layer 3: Multigame  
 
 Our goal is to create a platform that can be used to implement generic turn-based games. Different games would be represented by different data files that would be read by the platform. By what should the format of these files be? Should they be written in a platform-specific scripting language, or should they be allowed to execute arbitrary code? If we use the scripting language approach, we can control what the game files can do and what resources they can access, reducing the trust in the game developers. And if we make the language not Turing complete, we can analyze a game file and better reason about what it might do.
 
@@ -35,14 +35,14 @@ While a game is being played, it moves through a sequence of different game stat
 
 We can formally represent a game as a tuple (S, ?), where S is the set of all possible game states, and ? is the set of all options. In this way, a game becomes a state machine. (A formal state machine requires that each state transition be a pair of an input and output state. We can achieve this by saying that if any option is nondeterministic, then each possible resulting state has its own edge in the state machine.)
 
-This notation allows us to completely describe any game in a table, merely by listing the possible game states and listing all transitions. This doesn't mean that such a table will necessarily be short (or even have finite length!) For example, the game of Tic-Tac-Toe has 5,478 possible board states and 549,946 different possible options. (http://www.mathrec.org/old/2002jan/solutions.html) A more complicated game like chess could still be reperesented in this manner, but chess has 10^47 possible board states, and listing them all would be extremely impractical.
+This notation allows us to completely describe any game in a table, merely by listing the possible game states and listing all transitions. This doesn't mean that such a table will necessarily be short (or even have finite length!) [For example, the game of Tic-Tac-Toe has 5,478 possible board states and 549,946 different possible options.](http://www.mathrec.org/old/2002jan/solutions.html) A more complicated game like chess could still be reperesented in this manner, but chess has 10^47 possible board states, and listing them all would be extremely impractical.
 
 What is practical is calculating the part of the table that is immediately relevant for a given game state. Let's say that we have a tic-tac-toe board in the following position:
 
 X| |X
-- - -
+\- - -
  |X|O
-- - -
+\- - -
  | |O
 
 board = {X: [[0,0], [0,2], [1,1]], O: [[1,2], [2,2]]} (This is just one possible way we could represent the board as a data object.)
