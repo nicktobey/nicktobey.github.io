@@ -158,8 +158,6 @@ code {
   color: #bf616a;
   background-color: #f9f9f9;
   border-radius: 3px;
-  overflow-x:scroll;
-  overflow-y: none; /* add this line */
 }
 pre {
   display: block;
