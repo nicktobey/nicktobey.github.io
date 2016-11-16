@@ -1,3 +1,10 @@
+---
+layout: page
+title: 2016: A Postmortem
+short_title: 2016
+show: false
+---
+
 *I need to start things off by acknowledging that just because I can say what I want doesn't mean that my words have any value. I don't know what it's like to fear for my life based on my race or how I present myself. All I can do is look toward my role models who do know what it's like, and understand their experiences, their fears and their judgments. In polarizing times like this, I look to Majiid Nawaz, the founder of the Quillam anti-extremism think tank, and a former Muslim extremist who is now leading the charge on deradicalization movements. I found what he had to say about the election very informative, and I am echoing his fears. Of course, he speaks much better than I can, and draws from his own pivotal experience, so if you're going to read one blog post about this, you should read his instead:*
 
 *http://blogs.timesofisrael.com/the-fear-that-propelled-trump-requires-no-logic/*
