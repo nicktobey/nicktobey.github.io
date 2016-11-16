@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 2016: A Postmortem
+title: 2016 - A Postmortem
 short_title: 2016
 show: false
 ---
